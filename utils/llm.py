@@ -11,13 +11,15 @@ async def ainvoke(
     messages: list[dict[str, str]], model: Optional[str] = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
 ) -> dict:
     """Send messages to a Together AI model and return the chat completion response."""
+    if not messages:
+        raise ValueError("Messages list cannot be empty.")
     client = await get_together_client()
     try:
         response = await client.chat.completions.create(
-            model="model",
+            model=model,
             messages=messages
         )
     except APIError as e:
         print("Error during Together API call:", e)
-        raise
+        raise e
     return response
