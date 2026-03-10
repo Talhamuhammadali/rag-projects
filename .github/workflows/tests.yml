@@ -1,0 +1,45 @@
+# CI workflow for running tests
+
+name: Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      run_integration:
+        description: "Run integration tests"
+        type: boolean
+        default: false
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - run: pip install uv
+      - run: uv sync --dev
+
+      - run: uv run pytest tests/unit_tests -v
+
+  integration-tests:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_integration }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - run: pip install uv
+      - run: uv sync --dev
+
+      - run: uv run pytest tests/integration_tests -v
+        env:
+          TOGETHER_API_KEY: ${{ secrets.TOGETHER_API_KEY }}
