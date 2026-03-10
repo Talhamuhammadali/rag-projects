@@ -11,7 +11,8 @@ async def main():
     response = await ainvoke(
         [
             {"role": "user", "content": "What are some fun things to do in New York? keep it short."}
-        ]
+        ],
+        model="openai/gpt-oss-20b"
     )
     print("LLM Response:", response.choices[0].message.content)
 

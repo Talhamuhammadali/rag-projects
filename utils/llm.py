@@ -1,6 +1,6 @@
 """LLM utilities module: together ai and others."""
 from typing import Optional
-from together import AsyncTogether
+from together import AsyncTogether, APIError
 
 async def get_together_client():
     """Create and return an AsyncTogether client. Lazy-loaded to ensure env vars are available."""
@@ -12,8 +12,12 @@ async def ainvoke(
 ) -> dict:
     """Send messages to a Together AI model and return the chat completion response."""
     client = await get_together_client()
-    response = await client.chat.completions.create(
-        model=model,
-        messages=messages
-    )
+    try:
+        response = await client.chat.completions.create(
+            model="model",
+            messages=messages
+        )
+    except APIError as e:
+        print("Error during Together API call:", e)
+        raise
     return response
