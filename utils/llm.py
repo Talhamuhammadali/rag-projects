@@ -23,3 +23,7 @@ async def ainvoke(
         print("Error during Together API call:", e)
         raise e
     return response
+
+
+
+# TODO: add openai compatibile invoke for together ai
