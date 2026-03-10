@@ -7,6 +7,7 @@ from utils.llm import ainvoke
 load_dotenv(find_dotenv()) 
 
 async def main():
+    """Entry point: sends a test prompt to the LLM and prints the response."""
     response = await ainvoke(
         [
             {"role": "user", "content": "What are some fun things to do in New York? keep it short."}
