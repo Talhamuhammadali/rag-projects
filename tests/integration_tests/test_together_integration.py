@@ -1,10 +1,12 @@
 """Integration tests for together ai client — real API calls."""
 
+import os
+
+import numpy as np
 import pytest
 from dotenv import load_dotenv, find_dotenv
 
-from utils.llm import ainvoke
-from utils.embendings import get_embedding_together
+from utils import get_embedding_local, get_embedding_together, ainvoke
 from together._exceptions import APIError
 
 load_dotenv(find_dotenv())
@@ -79,6 +81,26 @@ async def test_embedding():
     assert hasattr(response.data[0], "embedding")
     assert isinstance(response.data[0].embedding, list)
     assert len(response.data[0].embedding) > 0
+
+
+@pytest.mark.asyncio
+async def test_embedding_local():
+    """Test that get_embedding_local returns a valid embedding."""
+    response = await get_embedding_local("Hello world")
+    assert isinstance(response, list)
+    assert len(response) > 0
+
+
+@pytest.mark.skipif(os.getenv("CI") == "true", reason="Large model download, skip in CI")
+@pytest.mark.asyncio
+async def test_local_and_together_embeddings_match():
+    """Test that the same model produces matching embeddings locally and via Together API."""
+    model = "intfloat/multilingual-e5-large-instruct"
+    text = "Hello world"
+    together_response = await get_embedding_together(text, model_name=model)
+    together_embedding = together_response.data[0].embedding
+    local_embedding = await get_embedding_local(text, model_name=model)
+    assert np.allclose(local_embedding, together_embedding, atol=1e-3)
 
 
 @pytest.mark.asyncio

@@ -39,7 +39,7 @@ async def get_embedding_local(text: str, model_name: str = "BAAI/bge-base-en-v1.
     """Get embedding for a given text using a local SentenceTransformer model."""
     model = _get_local_model(model_name)
     embedding = model.encode(text)
-    return embedding
+    return embedding.tolist()
 
 
 def load_dataframe(path: str) -> pd.DataFrame:
